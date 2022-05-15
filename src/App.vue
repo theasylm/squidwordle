@@ -434,7 +434,7 @@
 </script>
 
 <template>
-  <div class="container">
+  <div class="container wrap">
     <div class="header row">
       <div class="col-md-4">
       </div>
@@ -555,6 +555,24 @@
     background-color: #b9d7cd;
     height: 100%;
     padding-top: 1em;
+  }
+  .wrap:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    background-image: url('./src/assets/squidward.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: calc(100vh - 8rem);
+  }
+
+  .demo-content {
+    position: relative;
   }
   .header {
   }
