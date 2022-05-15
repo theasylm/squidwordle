@@ -52,6 +52,10 @@
 <template>
   <div class="tile" :class="[statusClasses[state],{ wide: letter.length > 1, revealed: state > 1 && !keyboard && !initialized, colored: colored, 'current-tile': isCurrentTile }]" @click="clickTile">
     <div class="letter">{{letter}}</div>
+    <span class="dot tr lg"></span>
+    <span class="dot ml sm"></span>
+    <span class="dot mc sm"></span>
+    <span class="dot lr md"></span>
   </div>
 </template>
 
@@ -69,6 +73,7 @@
     font-size: 1.8rem;
     font-weight: 600;
     transition: transform 1.4s;
+    overflow: hidden;
   }
   .current-tile {
     border-width: 5px;
@@ -99,5 +104,44 @@
   }
   .current .tile {
     cursor: pointer;
+  }
+  .dot {
+    background-color: #d3950c;
+    border-radius: 50%;
+    display: inline-block;
+    position: fixed;
+    z-index: -1000;
+    display: none;
+  }
+  .not-in-place.colored .dot {
+    display: inline-block;
+  }
+  .dot.sm {
+    height: 10px;
+    width: 10px;
+  }
+  .dot.md {
+    height: 13px;
+    width: 13px;
+  }
+  .dot.lg {
+    height: 16px;
+    width: 16px;
+  }
+  .dot.lr {
+    margin-top: -1.75rem;
+    margin-left: 1.5rem;
+  }
+  .dot.ml {
+    margin-top: .75rem;
+    margin-left: -2.5rem;
+  }
+  .dot.mc {
+    margin-top: -2rem;
+    margin-left: -2rem;
+  }
+  .dot.tr {
+    margin-top: 1.75rem;
+    margin-left: 1.5rem;
   }
 </style>

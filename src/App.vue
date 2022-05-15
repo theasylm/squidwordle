@@ -689,7 +689,7 @@
     max-height: 90%;
     margin: 0 1rem;
     padding: 1rem;
-    border: 1px solid #efefef;
+    border: 1px solid #000;
     border-radius: 0.25rem;
     background: #b9d7cd;
     width: 700px;
