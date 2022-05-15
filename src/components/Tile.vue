@@ -79,7 +79,7 @@
     border-width: 5px;
   }
   .unguessed.colored {
-    background-color: #818384;
+    background-color: #acb0b1;
   }
   .not-in-word.colored {
     background-color: #797982;
