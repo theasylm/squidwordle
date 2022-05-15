@@ -533,14 +533,6 @@
 </template>
 
 <style>
-  @font-face {
-    font-family: 'spongeboyregular';
-    src: url('spongeboyregular-gx2n6-webfont.woff2') format('woff2'),
-         url('spongeboyregular-gx2n6-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-
-  }
   body, html {
     height: 100%;
   }
@@ -565,7 +557,7 @@
     width: 100%;
     height: 100%;
     opacity: 0.25;
-    background-image: url('./squidward.svg');
+    background-image: url('../squidward.svg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: calc(100vh - 8rem);
@@ -574,13 +566,11 @@
   .demo-content {
     position: relative;
   }
-  .header {
+  .header,.info, .board {
+    position: relative;
   }
   .title {
     font-size: 2em;
-  }
-  .info {
-    position: relative;
   }
   .warning-message {
     visibility: hidden;
