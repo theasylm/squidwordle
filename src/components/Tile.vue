@@ -108,7 +108,6 @@
   .dot {
     background-color: #d3950c;
     border-radius: 50%;
-    display: inline-block;
     position: fixed;
     z-index: -1000;
     display: none;
@@ -143,5 +142,15 @@
   .dot.tr {
     margin-top: 1.75rem;
     margin-left: 1.5rem;
+  }
+  .keyboard .tile {
+    z-index: 0;
+  }
+  .keyboard .letter {
+    z-index: 1;
+  }
+  .keyboard .dot.ml {
+    margin-top: 1rem;
+    margin-left: -2.1rem;
   }
 </style>
