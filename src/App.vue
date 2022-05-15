@@ -520,11 +520,11 @@
           <div class="col-sm-12">
             Guess the Wordle in the given number of tries. After each guess, the tiles will be colored to indicate how close to the target word your guess was.
             <img src="./assets/green_clue.png"/>
-            Green indicates the N is in the correct spot.
+            Green indicates the Y is in the correct spot.
             <img src="./assets/yellow_clue.png"/>
-            Yellow indicates the U is in the word, but in another position.
+            Yellow indicates the S is in the word, but in another position.
             <p><img src="./assets/grey_clue.png"/>
-            Grey indicates the P is not in the word.</p>
+            Grey indicates the E is not in the word.</p>
           </div>
         </div>
       </div>
