@@ -565,7 +565,7 @@
     width: 100%;
     height: 100%;
     opacity: 0.25;
-    background-image: url('./src/assets/squidward.svg');
+    background-image: url('./squidward.svg');
     background-repeat: no-repeat;
     background-position: center center;
     background-size: calc(100vh - 8rem);
