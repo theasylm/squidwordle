@@ -23,7 +23,8 @@
     currentPosition: Number,
     currentGuess: Number,
     guessNumber: Number,
-    wordLength: Number
+    wordLength: Number,
+    completed: Boolean
   })
 
   let isCurrentTile = computed(() => {
