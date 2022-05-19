@@ -4,13 +4,14 @@
   import Board from './components/Board.vue'
   import Keyboard from './components/Keyboard.vue'
   import { PencilIcon, QuestionMarkCircleIcon, LightBulbIcon, XIcon, ChartBarIcon, RefreshIcon } from '@heroicons/vue/outline'
-  import { allWords } from './assets/js/allWords.js'
+  import { acceptedWordList } from './assets/js/accepted_word_list.js'
+  import { indexes } from './assets/js/indexes.js'
+  import { wordList } from './assets/js/wordlist.js'
 
-  let word = 'krabs'
-  const wordLength = word.length > 0 ? word.length : 0
-  const allPossibleWords = allWords[wordLength]
-  let numberOfGuesses = 6
   let gameNumber = 1
+  let word = wordList[indexes[gameNumber-1]]
+  const wordLength = word.length > 0 ? word.length : 0
+  let numberOfGuesses = 6
   let msg = ref("Aye-aye, captain!")
   let showWinModal = ref(false)
   let showHelpModal = ref(false)
@@ -250,7 +251,7 @@
       return false;
     }
 
-    return !allWords[wordLength].includes(playerAnswer.toUpperCase())
+    return !acceptedWordList.includes(playerAnswer.toLowerCase())
   })
 
   const showWordMissingMessage = function() {
@@ -294,7 +295,7 @@
     let playerAnswer = guess.map((e) => e['letter']).join('')
     correct.value = ( playerAnswer === word )
 
-    if ( !correct.value && !allPossibleWords.includes(playerAnswer.toUpperCase()) && !skipAnimation ){
+    if ( !correct.value && !acceptedWordList.includes(playerAnswer.toLowerCase()) && !skipAnimation ){
       showWordMissingMessage()
       return
     }
