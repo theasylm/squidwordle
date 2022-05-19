@@ -14,7 +14,9 @@
   let word = wordList[indexes[gameNumber-1]]
   const wordLength = word.length > 0 ? word.length : 0
   let numberOfGuesses = 6
-  let msg = ref("Aye-aye, captain!")
+  let msg = computed(() => {
+    return correct.value ? 'Aye-Aye, Captain!' : 'Barnacles!'
+  })
   let showWinModal = ref(false)
   let showHelpModal = ref(false)
   let showConfirmModal = ref(false)
@@ -412,9 +414,6 @@
     }
     results += "https://theasylm.github.io/squidwordle"
     gameResults.value = results
-    if (!correct.value){
-      msg.value = 'Barnacles!'
-    }
   }
 
   const copyResults = function() {
