@@ -26,12 +26,27 @@
     .keyboard .tile {
       width:  2.5rem;
       height: 2.5rem;
-      font-size: 2rem;
+      font-size: 1.5rem;
     }
     .keyboard .tile.wide {
       width: 5.5rem;
     }
-
+    .keyboard .dot.tr {
+      margin-top: 1.1rem;
+      margin-left: 1.2rem;
+    }
+    .keyboard .dot.ml {
+      margin-top: 1rem;
+      margin-left: -1.5rem;
+    }
+    .keyboard .dot.mc {
+      margin-top: -1.3rem;
+      margin-left: -1.7rem;
+    }
+    .keyboard .dot.lr {
+    margin-top: -1.5rem;
+    margin-left: 1.5rem;
+  }
   }
 
   @media (max-width: 500px){

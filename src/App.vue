@@ -15,6 +15,9 @@
   const wordLength = word.length > 0 ? word.length : 0
   let numberOfGuesses = 6
   let msg = computed(() => {
+    if ( !finished.value ) {
+      return ''
+    }
     return correct.value ? 'Aye-Aye, Captain!' : 'Barnacles!'
   })
   let showWinModal = ref(false)
@@ -31,6 +34,238 @@
   let notInDictionary = ref(false)
   let gaveUp = ref(false)
   let currentPosition = ref(0)
+  let totalWins = ref(0)
+  let totalGames = ref(0)
+  let currentStreak = ref(0)
+  let maxStreak = ref(0)
+  let remainingHours = ref(0)
+  let remainingMinutes = ref(0)
+  let remainingSeconds = ref(0)
+  let guessCounts = ref(Array())
+
+  guessCounts.value = JSON.parse(window.localStorage.getItem('guessCounts'))
+  if ( guessCounts.value === null ){
+    guessCounts.value = [0,0,0,0,0,0,0]
+  }
+
+  if ( window.localStorage.getItem('totalGames') != undefined ){
+    totalGames.value = window.localStorage.getItem('totalGames')
+  }
+
+  const xPercent = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '10%'
+    }
+    return guessCounts.value[0] / totalGames.value * 100 + '%'
+  })
+
+  const onePercent = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '10%'
+    }
+    return guessCounts.value[1] / totalGames.value * 100 + '%'
+  })
+
+  const twoPercent = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '10%'
+    }
+    return guessCounts.value[2] / totalGames.value * 100 + '%'
+  })
+
+  const threePercent = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '10%'
+    }
+    return guessCounts.value[3] / totalGames.value * 100 + '%'
+  })
+
+  const fourPercent = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '10%'
+    }
+    return guessCounts.value[4] / totalGames.value * 100 + '%'
+  })
+
+  const fivePercent = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '10%'
+    }
+    return guessCounts.value[5] / totalGames.value * 100 + '%'
+  })
+
+  const sixPercent = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '10%'
+    }
+    return guessCounts.value[6] / totalGames.value * 100 + '%'
+  })
+
+  if ( window.localStorage.getItem('totalWins') != undefined ){
+    totalWins.value = window.localStorage.getItem('totalWins')
+  }
+
+
+  if ( window.localStorage.getItem('currentStreak') != undefined ){
+    currentStreak.value = window.localStorage.getItem('currentStreak')
+  }
+ if ( window.localStorage.getItem('maxStreak') != undefined ){
+    maxStreak.value = window.localStorage.getItem('maxStreak')
+  }
+
+  const completeRow = function(skipAnimation) {
+    let skip = skipAnimation ? 0 : 1
+    let guess = guesses.value[currentGuess.value]
+    for ( let i = 0; i < guess.length; i++){
+      if ( guess[i]['letter'] === '' ) {
+        return
+      }
+    }
+
+    let answerLetters = word.split('')
+    let playerAnswer = guess.map((e) => e['letter']).join('')
+    correct.value = ( playerAnswer === word )
+
+    if ( !correct.value && !acceptedWordList.includes(playerAnswer.toLowerCase()) && !skipAnimation ){
+      showWordMissingMessage()
+      return
+    }
+
+    if ( !skipAnimation ){
+      window.localStorage.setItem('guesses',JSON.stringify(guesses.value))
+    }
+
+    let changedLetters = []
+    let keyboardUpdates = []
+    for ( let i=0; i < guess.length; i++ ) {
+      if ( guess[i]['letter'] === answerLetters[i] ) {
+        answerLetters[i] = null
+        changedLetters.push(i)
+        keyboardUpdates.push([guess[i]['letter'],4])
+        setTimeout( () => {
+          guess[i]['state'] = 4
+        }, 150 * (i) * skip)
+        setTimeout( () => {
+          guess[i]['colored'] = true
+        }, (450 + 150 * (i)) * skip)
+      }
+    }
+
+    for ( let i=0; i < guess.length; i++ ) {
+      if ( !changedLetters.includes(i) && answerLetters.includes(guess[i]['letter']) ){
+        answerLetters[answerLetters.indexOf(guess[i]['letter'])] = null
+        changedLetters.push(i)
+        keyboardUpdates.push([guess[i]['letter'],3])
+        setTimeout( () => {
+          guess[i]['state'] = 3
+        }, 150 * (i) * skip)
+        setTimeout( () => {
+          guess[i]['colored'] = true
+        }, (450 + 150 * (i)) * skip)
+      }
+    }
+
+    for ( let i=0; i < guess.length; i++ ) {
+      if ( !changedLetters.includes(i) ) {
+        keyboardUpdates.push([guess[i]['letter'],2])
+        setTimeout( () => {
+          guess[i]['state'] = 2
+        }, 150 * (i) * skip)
+        setTimeout( () => {
+          guess[i]['colored'] = true
+        }, (450 + 150 * (i)) * skip)
+      }
+    }
+
+    setTimeout( () => {
+      for ( let i=0; i < keyboardUpdates.length; i++ ) {
+        updateKeyboard(keyboardUpdates[i][0],keyboardUpdates[i][1])
+      }
+      if ( correct.value || finished.value ) {
+        genGameResults()
+        if ( !skipAnimation ){
+          storeResults()
+        }
+        showWinModal.value = true
+      }
+    }, 300 * guess.length * skip)
+
+    if ( correct.value ) {
+      finished.value = true
+      currentPosition.value = -1
+      currentGuess.value = -1
+      return
+    }
+
+    currentGuess.value++
+    currentPosition.value = 0
+    if (playerGuessCount.value < numberOfGuesses ){
+      playerGuessCount.value++
+    } else {
+      finished.value = true
+    }
+  }
+
+  const lastDate = window.localStorage.getItem('lastDate')
+  const todayString = today.toISOString().split('T')[0]
+  window.localStorage.setItem('lastDate',todayString)
+  if ( window.localStorage.getItem('guesses') != undefined && lastDate == todayString ) {
+    guesses.value = JSON.parse(window.localStorage.getItem('guesses'))
+    for ( let i=0; i < guesses.value.length; i++ ){
+      if ( guesses.value[i][0]['letter'] === '' ){
+        break;
+      }
+      completeRow(true)
+      if ( i == guesses.value.length - 1){
+        finished.value = true
+      }
+    }
+  }
+
+  function roundToTwo(value) {
+    return(Math.round(value * 100) / 100);
+  }
+  const winPercentage = computed(() => {
+    if ( totalGames.value == 0 ){
+      return '0.00'
+    }
+    return (100 * parseFloat(totalWins.value) / totalGames.value).toFixed(2)
+  })
+
+  let tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate()+1);
+  tomorrow.setHours(0)
+  tomorrow.setMinutes(0)
+  tomorrow.setSeconds(0)
+  tomorrow.setMilliseconds(0)
+  let milliseconds = tomorrow - today
+  let seconds = Math.floor(milliseconds / 1000);
+  let minutes = Math.floor(seconds / 60);
+  let hours = Math.floor(minutes / 60);
+
+  seconds = seconds % 60;
+  minutes = minutes % 60;
+
+  // 👇️ If you don't want to roll hours over, e.g. 24 to 00
+  // 👇️ comment (or remove) the line below
+  // commenting next line gets you `24:00:00` instead of `00:00:00`
+  // or `36:15:31` instead of `12:15:31`, etc.
+  hours = hours % 24;
+
+  remainingHours.value = hours
+  remainingMinutes.value = minutes
+  remainingSeconds.value = seconds
+
+  const timeUntilNew = computed(() => {
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate()+1);
+    tomorrow.setHours(0)
+    tomorrow.setMinutes(0)
+    tomorrow.setSeconds(0)
+    tomorrow.setMilliseconds(0)
+    //return tomorrow
+    return convertMsToTime(tomorrow - today.value)
+  })
 
   const addEmptyRow = function() {
     let initialGuess = []
@@ -40,7 +275,7 @@
     guesses.value.push(initialGuess)
   }
 
-  for ( let i=0; i < numberOfGuesses; i++ ){
+  for ( let i=guesses.value.length; i < numberOfGuesses; i++ ){
     addEmptyRow()
   }
 
@@ -213,6 +448,28 @@
     window.removeEventListener('tile-click',tileClick)
   })
 
+  window.onload = () => {
+    setInterval(() => {
+      if ( remainingSeconds.value == 0 ){
+        if (remainingMinutes.value > 0 || remainingHours.value > 0 ) {
+         remainingSeconds.value = 59
+        }
+      } else {
+        remainingSeconds.value--
+      }
+      if ( remainingSeconds.value == 59 ) {
+        if ( remainingMinutes.value == 0 ) {
+          if ( remainingHours.value > 0 ) {
+            remainingMinutes.value == 59
+            remainingHours.value--
+          }
+        } else {
+          remainingMinutes.value--
+        }
+      }
+    }, 1000)
+  }
+
   onMounted(() => {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(
@@ -286,93 +543,6 @@
     tile['letter'] = ''
   }
 
-  const completeRow = function(skipAnimation) {
-    let skip = skipAnimation ? 0 : 1
-    let guess = guesses.value[currentGuess.value]
-    for ( let i = 0; i < guess.length; i++){
-      if ( guess[i]['letter'] === '' ) {
-        return
-      }
-    }
-
-    let answerLetters = word.split('')
-    let playerAnswer = guess.map((e) => e['letter']).join('')
-    correct.value = ( playerAnswer === word )
-
-    if ( !correct.value && !acceptedWordList.includes(playerAnswer.toLowerCase()) && !skipAnimation ){
-      showWordMissingMessage()
-      return
-    }
-    let changedLetters = []
-    let keyboardUpdates = []
-    for ( let i=0; i < guess.length; i++ ) {
-      if ( guess[i]['letter'] === answerLetters[i] ) {
-        answerLetters[i] = null
-        changedLetters.push(i)
-        keyboardUpdates.push([guess[i]['letter'],4])
-        setTimeout( () => {
-          guess[i]['state'] = 4
-        }, 150 * (i) * skip)
-        setTimeout( () => {
-          guess[i]['colored'] = true
-        }, (450 + 150 * (i)) * skip)
-      }
-    }
-
-    for ( let i=0; i < guess.length; i++ ) {
-      if ( !changedLetters.includes(i) && answerLetters.includes(guess[i]['letter']) ){
-        answerLetters[answerLetters.indexOf(guess[i]['letter'])] = null
-        changedLetters.push(i)
-        keyboardUpdates.push([guess[i]['letter'],3])
-        setTimeout( () => {
-          guess[i]['state'] = 3
-        }, 150 * (i) * skip)
-        setTimeout( () => {
-          guess[i]['colored'] = true
-        }, (450 + 150 * (i)) * skip)
-      }
-    }
-
-    for ( let i=0; i < guess.length; i++ ) {
-      if ( !changedLetters.includes(i) ) {
-        keyboardUpdates.push([guess[i]['letter'],2])
-        setTimeout( () => {
-          guess[i]['state'] = 2
-        }, 150 * (i) * skip)
-        setTimeout( () => {
-          guess[i]['colored'] = true
-        }, (450 + 150 * (i)) * skip)
-      }
-    }
-
-    setTimeout( () => {
-      for ( let i=0; i < keyboardUpdates.length; i++ ) {
-        updateKeyboard(keyboardUpdates[i][0],keyboardUpdates[i][1])
-      }
-      if ( correct.value || finished.value ) {
-        genGameResults()
-        showWinModal.value = true
-      }
-    }, 300 * guess.length * skip)
-
-    if ( correct.value ) {
-      finished.value = true
-      currentPosition.value = -1
-      currentGuess.value = -1
-      return
-    }
-
-    currentGuess.value++
-    currentPosition.value = 0
-    if (!skipAnimation ){
-      if (playerGuessCount.value < numberOfGuesses ){
-        playerGuessCount.value++
-      } else {
-        finished.value = true
-      }
-    }
-  }
-
   const updateKeyboard = function(letter,state) {
     let keyPosition = findKey(letter)
     if ( keyboardRows.value[keyPosition[0]][keyPosition[1]]['state'] < state ){
@@ -416,6 +586,29 @@
     gameResults.value = results
   }
 
+  const storeResults = function() {
+    if ( correct.value ) {
+      totalWins.value++
+      window.localStorage.setItem('totalWins',totalWins.value)
+      currentStreak.value++
+      window.localStorage.setItem('currentStreak',currentStreak.value)
+      if ( currentStreak.value > maxStreak.value ){
+        maxStreak.value++
+        window.localStorage.setItem('maxStreak',maxStreak.value)
+      }
+    } else {
+      currentStreak.value = 0
+      window.localStorage.setItem('currentStreak',currentStreak.value)
+    }
+    if ( correct.value ){
+      guessCounts.value[playerGuessCount.value]++
+    } else {
+      guessCounts.value[0]++
+    }
+    window.localStorage.setItem('guessCounts',JSON.stringify(guessCounts.value))
+    totalGames.value++
+    window.localStorage.setItem('totalGames',totalGames.value)
+  }
   const copyResults = function() {
     navigator.clipboard.writeText(gameResults.value)
     let span = document.getElementById('copiedResultsMessage')
@@ -438,14 +631,14 @@
 <template>
   <div class="container wrap">
     <div class="header row">
-      <div class="col-md-4">
+      <div class="col-md-3">
       </div>
-      <div class="col-md-4">
-        <span class="title">Squidwordle</span>
+      <div class="col-md-6">
+        <span class="title">Squidwordle #{{gameNumber}} </span>
       </div>
-      <div class="col-md-4 help">
+      <div class="col-md-3 help">
         <XIcon class="give-up-icon" @click="showConfirmModal = (true && !finished)"></XIcon>
-        <ChartBarIcon :class="{ inactive: !finished }" @click="showWinModal = (true && finished)"></ChartBarIcon>
+        <ChartBarIcon @click="showWinModal = true"></ChartBarIcon>
         <QuestionMarkCircleIcon @click="showHelpModal = true"></QuestionMarkCircleIcon>
       </div>
     </div>
@@ -500,8 +693,64 @@
       <span class="modal__title" id="win-msg">{{msg}}</span>
       <div class="modal__content">
         <div class="solution" v-if="finished && !correct">Solution: {{word.toUpperCase()}}</div>
-        <button class="btn btn-primary share-button" @click="copyResults">Share results</button><br/>
-        <span id="copiedResultsMessage">Copied!</span>
+        <div class="row stats">
+          <div class="col-4">
+            <span class="number">{{totalGames}}</span>
+            <span class="stat-label">Total Games</span>
+          </div>
+          <div class="col-4">
+            <span class="number">{{totalWins}}</span>
+            <span class="stat-label">Total Wins</span>
+          </div>
+          <div class="col-4">
+            <span class="number">{{winPercentage}}</span>
+            <span class="stat-label">Win %</span>
+          </div>
+        </div>
+        <div class="row stats">
+          <div class="col-6">
+            <span class="number">{{currentStreak}}</span>
+            <span class="stat-label">Current Streak</span>
+          </div>
+          <div class="col-6">
+            <span class="number">{{maxStreak}}</span>
+            <span class="stat-label">Max Streak</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">Guess Distribution</div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <div class="bar-label">X:</div>
+            <div class="bar-label">1:</div>
+            <div class="bar-label">2:</div>
+            <div class="bar-label">3:</div>
+            <div class="bar-label">4:</div>
+            <div class="bar-label">5:</div>
+            <div class="bar-label">6:</div>
+          </div>
+          <div class="col-8">
+            <div class="bar" :style="{'width': xPercent}">{{guessCounts[0]}}</div>
+            <div class="bar" :style="{'width': onePercent}">{{guessCounts[1]}}</div>
+            <div class="bar" :style="{'width': twoPercent}">{{guessCounts[2]}}</div>
+            <div class="bar" :style="{'width': threePercent}">{{guessCounts[3]}}</div>
+            <div class="bar" :style="{'width': fourPercent}">{{guessCounts[4]}}</div>
+            <div class="bar" :style="{'width': fivePercent}">{{guessCounts[5]}}</div>
+            <div class="bar" :style="{'width': sixPercent}">{{guessCounts[6]}}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <span class="timer">{{remainingHours.toString().padStart(2,'0')}}:{{remainingMinutes.toString().padStart(2,'0')}}:{{remainingSeconds.toString().padStart(2,'0')}}</span>
+            <span class="next">Next Squidwordle</span>
+
+          </div>
+          <div class="col-6">
+            <button class="btn btn-primary share-button" @click="copyResults" :disabled="!finished">Share results</button><br/>
+            <span id="copiedResultsMessage">Copied!</span>
+          </div>
+        </div>
       </div>
     </vue-final-modal>
     <vue-final-modal
@@ -689,6 +938,19 @@
     font-size: smaller;
     width: 100%;
     left: 0;
+  }
+  span.number, span.timer {
+    display: block;
+    font-size: 2rem;
+  }
+  .timer {
+    margin-top: .75rem;
+  }
+  .bar {
+    background-color: #4192cf;
+  }
+  .bar-label {
+    text-align: right;
   }
 </style>
 <style scoped>
