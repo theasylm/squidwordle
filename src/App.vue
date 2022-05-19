@@ -8,7 +8,9 @@
   import { indexes } from './assets/js/indexes.js'
   import { wordList } from './assets/js/wordlist.js'
 
-  let gameNumber = 1
+  let startDay = new Date(2022,4,19)
+  let today = new Date()
+  let gameNumber = Math.floor((today - startDay) / (1000 * 60 * 60 * 24)) + 1
   let word = wordList[indexes[gameNumber-1]]
   const wordLength = word.length > 0 ? word.length : 0
   let numberOfGuesses = 6
