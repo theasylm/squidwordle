@@ -207,9 +207,9 @@
   }
 
   const lastDate = window.localStorage.getItem('lastDate')
-  const todayString = today.toISOString().split('T')[0]
+  const todayString = "" + today.getFullYear() + today.getMonth() + today.getDate()
   window.localStorage.setItem('lastDate',todayString)
-  if ( window.localStorage.getItem('guesses') != undefined && lastDate == todayString ) {
+  if ( window.localStorage.getItem('guesses') != undefined && lastDate === todayString ) {
     guesses.value = JSON.parse(window.localStorage.getItem('guesses'))
     for ( let i=0; i < guesses.value.length; i++ ){
       if ( guesses.value[i][0]['letter'] === '' ){
