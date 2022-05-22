@@ -220,6 +220,8 @@
         finished.value = true
       }
     }
+  } else {
+    window.localStorage.setItem('guesses',JSON.stringify([]))
   }
 
   function roundToTwo(value) {
